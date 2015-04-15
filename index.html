@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head>
+<title>Find a task</title>
+<style>
+#container,#loadingscreen,#widecontainer{
+  font-family:sans-serif;
+  text-align:center;
+  margin:auto;
+}
+#container,#loadingscreen{
+  min-width:100px;
+  max-width:450px;
+}
+#container,#widecontainer,#showapplicablecards,#applicablecardstable,#allcardsheader,#allcardstable{
+  display:none;
+}
+#result{
+  text-align:left;
+  border:1px solid black;
+  padding:0px 10px;
+  margin:20px 0px;
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  border-radius:10px;
+}
+#timer,#feedback{
+  font-weight:bold;
+}
+#applicablecardstable,#allcardstable{
+  margin-top:20px;
+}
+#allcardsheader{
+  margin-top:40px;
+}
+</style>
+<script src="https://www.google.com/jsapi"></script>
+<script src="jquery-1.11.2.min.js"></script>
+<script src="jquery.cookie.js"></script>
+<script src="jquery.linkify.min.js"></script>
+<script src="findmeatask.js"></script>
+</head><body>
+<div id="loadingscreen">Loading...</div>
+<div id="container">
+  <p id="timebuttons">Find me a task that takes:<br></p>
+  <form id="timeform">
+    <p><span id="timecustom">I am free for <input type="number" size="2" min="0" step="1" id="timeamount"> <select id="timeunit"><option value="1">second(s)</option><option value="60" selected>minute(s)</option><option value="3600">hour(s)</option><option value="86400">day(s)</option></select><br></span><input type="submit" value="Find me a task" id="timesubmit"><br><span id="showapplicablecards"><button id="showapplicablecardsbutton">Show all applicable tasks</button></span></p>
+  </form>
+  <p id="feedback">
+    Time is up!<br>
+    How did you do?<br>
+    <button id="feedbacklow">:-|</button> <button id="feedbackmedium">:-)</button> <button id="feedbackhigh">:-D</button>
+  </p>
+  <div id="result"></div>
+  <p id="timer"></p>
+  <p id="showpreferences"><a id="showpreferencesbutton" href="#">Edit preferences</a></p>
+  <p id="categories">Categories:</p>
+  <p id="points"></p>
+</div>
+<div id="widecontainer">
+  <div id="applicablecardstable"></div>
+  <p id="showallcards"><a id="showallcardsbutton" href="#">Show all available tasks</a></p>
+  <h3 id="allcardsheader">All available tasks:</h3>
+  <div id="allcardstable"></div>
+  <p><a href="https://trello.com/b/wv8ER0TG/">Full Trello board</a></p>
+</div>
+</body></html>
