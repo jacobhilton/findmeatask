@@ -285,7 +285,7 @@
           .append(document.createTextNode("Votes: "+card.votes))
           .append($("<br>"))
           .append($("<a></a>").attr("href",card.url).text("Trello card"))
-          .append(document.createTextNode(" (login to vote)"))
+          .append(document.createTextNode(" (login to vote or comment)"))
         );
     };
 
@@ -338,18 +338,18 @@
         data.addColumn("number","Maximum time (minutes)");
         //data.addColumn("number","Average");
         data.addColumn("string","Category");
-        data.addColumn("string","Labels");
+        //data.addColumn("string","Labels");
         data.addColumn("number","Votes");
         data.addColumn("string","Full description");
         //data.addColumn("string","Trello card URL");
         var rows=[];
         for(var i=0;i<cards.length;i++){
-          rows[i]=[cards[i].name,cardtables.round(cards[i].minseconds/60),cardtables.round(cards[i].maxseconds/60),/*cardtables.round((cards[i].minseconds+cards[i].maxseconds)/120),*/cards[i].list,cards[i].labels.join(", "),cards[i].votes,"(hover to view / click to select)"];//,cards[i]["url"]];
+          rows[i]=[cards[i].name,cardtables.round(cards[i].minseconds/60),cardtables.round(cards[i].maxseconds/60),/*cardtables.round((cards[i].minseconds+cards[i].maxseconds)/120),*/cards[i].list,/*cards[i].labels.join(", "),*/cards[i].votes,"(hover to view / click to select)"];//,cards[i]["url"]];
         }
         data.addRows(rows);
         var randomclass="task"+Math.random().toString().split(".")[1]+"number";
         for(var i=0;i<cards.length;i++){
-          data.setProperty(i,6,"className",randomclass+i);
+          data.setProperty(i,5,"className",randomclass+i);
         }
         var table=new google.visualization.Table(document.getElementById(divid));
         table.draw(data);
