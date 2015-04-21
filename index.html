@@ -9,9 +9,9 @@
 }
 #container,#loadingscreen{
   min-width:100px;
-  max-width:450px;
+  max-width:850px;/*450px;*/
 }
-#container,#widecontainer,#showapplicablecards,#applicablecardstable,#allcardsheader,#allcardstable{
+#container,#widecontainer,#showapplicablecards,#applicablecardstable{
   display:none;
 }
 #result{
@@ -31,6 +31,9 @@
 }
 #allcardsheader{
   margin-top:40px;
+}
+.small{
+  font-size:0.8em;
 }
 </style>
 <script src="https://www.google.com/jsapi"></script>
@@ -54,12 +57,12 @@
   <p id="timer"></p>
   <p id="showpreferences"><a id="showpreferencesbutton" href="#">Edit preferences</a></p>
   <p id="categories">Categories:</p>
+  <p><a id="addataskbutton" href="#">Add a task</a></p>
   <p id="points"></p>
 </div>
 <div id="widecontainer">
   <div id="applicablecardstable"></div>
-  <p id="showallcards"><a id="showallcardsbutton" href="#">Show all available tasks</a></p>
-  <h3 id="allcardsheader">All available tasks:</h3>
+  <h3 id="allcardsheader">Suggested high-impact tasks:</h3>
   <div id="allcardstable"></div>
   <p><a href="https://trello.com/b/wv8ER0TG/">Full Trello board</a></p>
 </div>
