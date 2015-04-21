@@ -102,6 +102,7 @@
             }
             var list=lists[data[cardnumber].idList];
             cards.push({
+              "id":data[cardnumber].shortLink,
               "name":data[cardnumber].name,
               "description":data[cardnumber].desc,
               "url":data[cardnumber].url,
@@ -110,7 +111,8 @@
               "mintime":mintime,
               "maxtime":maxtime,
               "labels":labels,
-              "list":list
+              "list":list,
+              "votes":data[cardnumber].idMembersVoted.length
             });
           }
           callback(cards);
@@ -279,7 +281,12 @@
           .append(maxtimeb)
           .append(document.createTextNode("."))
         )
-        ;//.append($("<p></p>").append($("<a></a>").attr("href",card.url).text("Trello card")));
+        .append($("<p></p>").addClass("small")
+          .append(document.createTextNode("Votes: "+card.votes))
+          .append($("<br>"))
+          .append($("<a></a>").attr("href",card.url).text("Trello card"))
+          .append(document.createTextNode(" (login to vote)"))
+        );
     };
 
     var cachedcards={};
@@ -315,6 +322,60 @@
           }
         });
       };
+    };
+
+    var cardtables={
+      "round":function(n){
+        return Math.round(n*100)/100;
+      },
+      "display":function(cards,divid){
+        cards=$.extend(true,[],cards);
+        cards.sort(function(a,b){if(a.title<b.title){return -1;}else if(a.title>b.title){return 1;}else{return 0;}});
+        cards=cards.filter(function(a){return a.mintime!="not specified"&&a.maxtime!="not specified";});
+        var data=new google.visualization.DataTable();
+        data.addColumn("string","Title");
+        data.addColumn("number","Minimum time (minutes)");
+        data.addColumn("number","Maximum time (minutes)");
+        //data.addColumn("number","Average");
+        data.addColumn("string","Category");
+        data.addColumn("string","Labels");
+        data.addColumn("number","Votes");
+        data.addColumn("string","Full description");
+        //data.addColumn("string","Trello card URL");
+        var rows=[];
+        for(var i=0;i<cards.length;i++){
+          rows[i]=[cards[i].name,cardtables.round(cards[i].minseconds/60),cardtables.round(cards[i].maxseconds/60),/*cardtables.round((cards[i].minseconds+cards[i].maxseconds)/120),*/cards[i].list,cards[i].labels.join(", "),cards[i].votes,"(hover to view / click to select)"];//,cards[i]["url"]];
+        }
+        data.addRows(rows);
+        var randomclass="task"+Math.random().toString().split(".")[1]+"number";
+        for(var i=0;i<cards.length;i++){
+          data.setProperty(i,6,"className",randomclass+i);
+        }
+        var table=new google.visualization.Table(document.getElementById(divid));
+        table.draw(data);
+        var enhance=(function(cards,divid,randomclass){
+          return function(){
+            //$("#"+divid).linkify();
+            for(var i=0;i<cards.length;i++){
+              $("."+randomclass+i).prop("title",cards[i].description).click((function(card){
+                return function(){
+                  timer.init(card.minseconds<=timer.lastseconds&&timer.lastseconds<=card.maxseconds?timer.lastseconds:(card.minseconds+card.maxseconds)/2);
+                  displaycard(card);
+                  cardtables.scrollto($("#result"));
+                }
+              })(cards[i]));
+            }
+          };
+        })(cards,divid,randomclass);
+        enhance();
+        google.visualization.events.addListener(table,"sort",enhance);
+      },
+      "showingapplicable":false,
+      "scrollto":function(place){
+        $("html,body").animate({
+          "scrollTop":place.offset().top
+        },200);
+      }
     };
 
     var init=function(){
@@ -364,16 +425,19 @@
           $("#feedback").hide();
         });
       });
-      $("#widecontainer").show();
-      $("#showallcardsbutton").click(function(){
+      $("#addataskbutton").click(function(){
         event.preventDefault();
-        $("#showallcards").hide();
-        $("#allcardsheader").show();
-        $("#allcardstable").show();
-        visualization.onceloaded(function(){
-          cardtables.display(allcards,"allcardstable");
-          cardtables.scrollto($("#allcardstable"));
-        });
+        for(var i=0;i<allcards.length;i++){
+          if(allcards[i].id=="mllu7kXU"){
+            timer.init(allcards[i].maxseconds);
+            displaycard(allcards[i]);
+            break;
+          }
+        }
+      });
+      $("#widecontainer").show();
+      visualization.onceloaded(function(){
+        cardtables.display(allcards,"allcardstable");
       });
       $("#showapplicablecardsbutton").click(function(){
         event.preventDefault();
@@ -386,57 +450,6 @@
           });
         });
       });
-    };
-
-    var cardtables={
-      "display":function(cards,divid){
-        cards=$.extend(true,[],cards);
-        cards.sort(function(a,b){if(a.title<b.title){return -1;}else if(a.title>b.title){return 1;}else{return 0;}});
-        var data=new google.visualization.DataTable();
-        data.addColumn("string","Title");
-        data.addColumn("string","Minimum time (use seconds to sort)");
-        data.addColumn("string","Maximum time (use seconds to sort)");
-        data.addColumn("number","Minimum time (seconds)");
-        data.addColumn("number","Maximum time (seconds)");
-        data.addColumn("number","Average");
-        data.addColumn("string","Category");
-        data.addColumn("string","Labels");
-        data.addColumn("string","Full description");
-        //data.addColumn("string","Trello card URL");
-        var rows=[];
-        for(var i=0;i<cards.length;i++){
-          rows[i]=[cards[i].name,cards[i].mintime,cards[i].maxtime,cards[i].minseconds,cards[i].maxseconds,(cards[i].minseconds+cards[i].maxseconds)/2,cards[i].list,cards[i].labels.join(", "),"(hover to view / click to select)"];//,cards[i]["url"]];
-        }
-        data.addRows(rows);
-        var randomclass="task"+Math.random().toString().split(".")[1]+"number";
-        for(var i=0;i<cards.length;i++){
-          data.setProperty(i,8,"className",randomclass+i);
-        }
-        var table=new google.visualization.Table(document.getElementById(divid));
-        table.draw(data);
-        var enhance=(function(cards,divid,randomclass){
-          return function(){
-            //$("#"+divid).linkify();
-            for(var i=0;i<cards.length;i++){
-              $("."+randomclass+i).prop("title",cards[i].description).click((function(card){
-                return function(){
-                  timer.init(card.minseconds<=timer.lastseconds&&timer.lastseconds<=card.maxseconds?timer.lastseconds:(card.minseconds+card.maxseconds)/2);
-                  displaycard(card);
-                  cardtables.scrollto($("#result"));
-                }
-              })(cards[i]));
-            }
-          };
-        })(cards,divid,randomclass);
-        enhance();
-        google.visualization.events.addListener(table,"sort",enhance);
-      },
-      "showingapplicable":false,
-      "scrollto":function(place){
-        $("html,body").animate({
-          "scrollTop":place.offset().top
-        },200);
-      }
     };
 
   });
