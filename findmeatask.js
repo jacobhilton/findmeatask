@@ -344,12 +344,19 @@
         //data.addColumn("string","Trello card URL");
         var rows=[];
         for(var i=0;i<cards.length;i++){
-          rows[i]=[cards[i].name,cardtables.round(cards[i].minseconds/60),cardtables.round(cards[i].maxseconds/60),/*cardtables.round((cards[i].minseconds+cards[i].maxseconds)/120),*/cards[i].list,/*cards[i].labels.join(", "),*/cards[i].votes,"(hover to view / click to select)"];//,cards[i]["url"]];
+          rows[i]=[cards[i].name,cardtables.round(cards[i].minseconds/60),cardtables.round(cards[i].maxseconds/60),/*cardtables.round((cards[i].minseconds+cards[i].maxseconds)/120),*/cards[i].list,/*cards[i].labels.join(", "),*/cards[i].votes,"(hover to view)"];//,cards[i]["url"]];
         }
         data.addRows(rows);
         var randomclass="task"+Math.random().toString().split(".")[1]+"number";
         for(var i=0;i<cards.length;i++){
-          data.setProperty(i,5,"className",randomclass+i);
+          for(var j=0;j<rows[i].length;j++){
+            if(j==rows[i].length-1){
+              data.setProperty(i,j,"className",randomclass+i+"hoverclick");
+            }
+            else{
+              data.setProperty(i,j,"className",randomclass+i+"click");
+            }
+          }
         }
         var table=new google.visualization.Table(document.getElementById(divid));
         table.draw(data);
@@ -357,7 +364,8 @@
           return function(){
             //$("#"+divid).linkify();
             for(var i=0;i<cards.length;i++){
-              $("."+randomclass+i).prop("title",cards[i].description).click((function(card){
+              $("."+randomclass+i+"hoverclick").prop("title",cards[i].description);
+              $("."+randomclass+i+"click,."+randomclass+i+"hoverclick").css({"cursor":"pointer"}).click((function(card){
                 return function(){
                   timer.init(card.minseconds<=timer.lastseconds&&timer.lastseconds<=card.maxseconds?timer.lastseconds:(card.minseconds+card.maxseconds)/2);
                   displaycard(card);
